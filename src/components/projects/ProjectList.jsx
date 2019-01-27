@@ -10,7 +10,7 @@ const ProjectList = ({ projects }) => {
         projects.map(project => {
           return (
             <Link to={'/projects/' + project.id} key={project.id}>
-              <ProjectSummary projects={project} key={project.id} />
+              <ProjectSummary projects={project}/>
             </Link>
           )
         })}
