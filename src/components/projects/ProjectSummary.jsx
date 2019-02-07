@@ -1,15 +1,44 @@
-import React from 'react'
+// import React from 'react'
 
-const ProjectSummary = ({projects}) => {
+import React, { Component } from 'react';
+import moment from 'moment'
+import {Link} from 'react-router-dom';
 
-  return (
-    <div className='card z-depth-0 project-summary'>
+// const ProjectSummary = ({ projects, id}) => {
+  // return (
+    // <div className='card z-depth-0 project-summary'>
+    //   <div className='card-content grey-text text-darken-3'>
+    //   <Link to={'/projects/' + id}  >
+    //     <span className='pink-text card-title '>{projects.title}</span> 
+    //   </Link>
+    //     <p>Posted by the {projects.authorFirstName} {projects.authorLastName}</p>
+    //     <p className='grey-text'>{moment(projects.createdAt.toDate()).calendar()}</p>
+    //     <p>delete</p>
+    //   </div>
+    // </div>
+//   )
+// }
+
+// export default ProjectSummary
+
+
+class ProjectSummary extends Component {
+
+  render() {
+    const{ projects, id}=this.props;
+    return (
+      <div className='card z-depth-0 project-summary'>
       <div className='card-content grey-text text-darken-3'>
-      <span className="card-title ">{projects.title}</span>        <p>Posted by the Super Mario</p>
-        <p className='grey-text'>24th of January, 2am</p>
+      <Link to={'/projects/' + id}  >
+        <span className='pink-text card-title '>{projects.title}</span> 
+      </Link>
+        <p>Posted by the {projects.authorFirstName} {projects.authorLastName}</p>
+        <p className='grey-text'>{moment(projects.createdAt.toDate()).calendar()}</p>
+        <p>delete</p>
       </div>
     </div>
-  )
+    );
+  }
 }
 
-export default ProjectSummary
+export default ProjectSummary;
