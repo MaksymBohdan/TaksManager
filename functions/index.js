@@ -23,13 +23,26 @@ exports.projectCreated = functions.firestore
  .onCreate(doc => { // takes doc which was created and applying code below
   const project = doc.data();
   const notification = {
-    content: 'Added a new project',
+    title:`${project.title}`,
+    content: 'project has been added',
     user: `${project.authorFirstName} ${project.authorLastName}`,
     time: admin.firestore.FieldValue.serverTimestamp() //creating timestamp
     }
     return createNotification(notification);
   }
 )
+exports.projectDeleted = functions.firestore
+  .document('projects/{projectId}')
+  .onDelete(doc => {
+    const project = doc.data();
+    const notification = {
+      title: `${project.title}`,
+      content: `project has been deleted`,
+      user: `${project.authorFirstName} ${project.authorLastName}`,
+      time: admin.firestore.FieldValue.serverTimestamp() //creating timestamp
+    }
+    return createNotification(notification);
+  })
 
 exports.userJoined = functions.auth.user()
   .onCreate(user => {
@@ -39,7 +52,7 @@ exports.userJoined = functions.auth.user()
         //accessing a data from the document
         const newUser = doc.data();
         const notification = {
-          content: 'Joined the App',
+          content: 'joined the App',
           user: `${newUser.firstName} ${newUser.lastName}`,
           time: admin.firestore.FieldValue.serverTimestamp()//creating timestamp
         };

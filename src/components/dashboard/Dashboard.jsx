@@ -42,6 +42,6 @@ export default compose(
   firestoreConnect([
     // HOC for connecting to a single collection in firebase
     { collection: 'projects', orderBy:['createdAt','desc'] /* the order of mapping*/}, // when component is active use projects collection to put in appropriate cell in state
-    {collection: 'notifications', limit: 5, orderBy:['time','desc']} // connecting to notification collection
+    {collection: 'notifications', limit: 3, orderBy:['time','desc']} // connecting to notification collection
   ])
 )(Dashboard)

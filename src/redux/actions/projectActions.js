@@ -18,3 +18,27 @@ export const createProject = (project) => {
   })
   }
 }
+
+export const deleteProject =(id) => {
+    return(dispatch, getState, {getFirebase, getFirestore}) =>{
+      const firestore = getFirestore();
+      firestore.collection('projects').doc(id).delete()
+      .then(()=>{
+        dispatch({ type: 'DELETE_PROJECT', id: id})
+      }).catch((err)=>{
+        dispatch({ type: 'CREATE_PROJECT_ERROR', err:err}) 
+      })
+    }
+}
+
+export const editProject =(id, editedProject)=> {
+  return (dispatch, getState, {getFirebase, getFirestore}) =>{
+    const firestore = getFirestore();
+    firestore.collection('projects').doc(id).update(editedProject)
+    .then(()=>{
+      dispatch({ type: 'EDIT_PROJECT', id: id})
+    }).catch((err)=>{
+      dispatch({ type: 'CREATE_PROJECT_ERROR', err:err}) 
+    })
+  }
+}
