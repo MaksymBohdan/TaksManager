@@ -6,6 +6,7 @@ import ProjectDetails from './components/projects/ProjectDetails';
 import SignIn from './components/auth/SignIn';
 import SignUp from './components/auth/SignUp';
 import CreateProject from './components/projects/CreateProject'
+import './App.css';
 
 class App extends Component {
   render () {
@@ -25,4 +26,6 @@ class App extends Component {
     )
   }
 }
-export default App
+
+
+export default App 

@@ -1,0 +1,9 @@
+
+.toDoContainer{
+  background-color: rgba(236, 220, 250, 0.5);
+  overflow:auto;
+  min-height: 300px !important;
+  max-height: 300px;
+  margin-left: 10px;
+}
+
