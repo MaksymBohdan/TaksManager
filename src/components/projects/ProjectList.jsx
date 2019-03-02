@@ -1,5 +1,6 @@
 import React from 'react';
 import ProjectSummary from './ProjectSummary';
+import {Droppable} from 'react-beautiful-dnd'
 
 const ProjectList = ({ projects }) => {
 

@@ -2,11 +2,13 @@ import React, { Component } from 'react'
 import {connect} from 'react-redux';
 import {createProject} from '../../redux/actions/projectActions'
 import { Redirect } from 'react-router-dom'
+import uuidv4 from 'uuid/v4';
 
 class CreateProject extends Component {
   state = {
     title: '',
-    content: ''
+    content: '',
+   
   }
 
   handleChange = e => {
@@ -18,7 +20,11 @@ class CreateProject extends Component {
   //getting value to firestore
   handleSubmit = e => {
     e.preventDefault()
-   this.props.createProject(this.state)
+    const newProject={
+      ...this.state,
+      idDnD: uuidv4(),
+    }
+   this.props.createProject(newProject)
    this.props.history.push('/');
   }
 

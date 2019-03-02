@@ -8,6 +8,7 @@ import { deleteProject, editProject } from '../../redux/actions/projectActions'
 import ModalDelete from './ModalDelete'
 import ModalEdit from './ModalEdit';
 
+
 class ProjectDetails extends Component {
   state = {
     title: '',
@@ -23,6 +24,7 @@ class ProjectDetails extends Component {
 
   handleDeleteProject = e => {
     const id = e.target.dataset.id
+    console.log(id)
     this.props.deleteProject(id)
     this.props.history.push('/')
   }
@@ -59,6 +61,7 @@ class ProjectDetails extends Component {
 
     if (project) {
       return (
+
         <div className='container section project-details'>
           <div className='card z-depth-0'>
             <div className='card-content'>

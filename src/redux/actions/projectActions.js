@@ -5,6 +5,13 @@ export const createProject = (project) => {
   const firestore = getFirestore() 
   const profile =getState().firebase.profile; // getting profile from the state
   const authorId = getState().firebase.auth.uid;
+
+  firestore.collection('columns').doc('column-1').update({
+
+    taskIds: firestore.FieldValue.arrayUnion(project.idDnD)
+
+  });
+
   firestore.collection('projects').add({ // adding to database before dispatch
     ...project,
     authorFirstName: profile.firstName, 
