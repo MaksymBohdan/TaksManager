@@ -1,51 +1,63 @@
 export const createProject = (project) => {
-   // 2,   3,4 - distructarization from withExtraArgument
-  return(dispatch, getState, {getFirebase, getFirestore}) =>{
-  //make async call to DATABASE
-  const firestore = getFirestore() 
-  const profile =getState().firebase.profile; // getting profile from the state
-  const authorId = getState().firebase.auth.uid;
+  // 2,   3,4 - distructarization from withExtraArgument
+  return (dispatch, getState, { getFirebase, getFirestore }) => {
+    //make async call to DATABASE
+    const firestore = getFirestore()
+    const profile = getState().firebase.profile; // getting profile from the state
+    const authorId = getState().firebase.auth.uid;
 
-  firestore.collection('columns').doc('column-1').update({
+    firestore.collection('columns').doc('column-1').update({
 
-    taskIds: firestore.FieldValue.arrayUnion(project.idDnD)
+      taskIds: firestore.FieldValue.arrayUnion(project.id)
 
-  });
+    });
 
-  firestore.collection('projects').add({ // adding to database before dispatch
-    ...project,
-    authorFirstName: profile.firstName, 
-    authorLastName: profile.lastName,
-    authorId: authorId,
-    createdAt: new Date()
-  }).then(()=>{ // promise logic
-    dispatch({ type:'CREATE_PROJECT', project: project })
-  }).catch((err)=>{
-    dispatch({ type: 'CREATE_PROJECT_ERROR', err:err}) // send to reducer if error
-  })
+    firestore.collection('projects').doc(project.id).set({ // adding to database before dispatch
+      ...project,
+      authorFirstName: profile.firstName,
+      authorLastName: profile.lastName,
+      authorId: authorId,
+      createdAt: new Date()
+    }).then(() => { // promise logic
+      dispatch({ type: 'CREATE_PROJECT', project: project })
+    }).catch((err) => {
+      dispatch({ type: 'CREATE_PROJECT_ERROR', err: err }) // send to reducer if error
+    })
   }
 }
 
-export const deleteProject =(id) => {
-    return(dispatch, getState, {getFirebase, getFirestore}) =>{
-      const firestore = getFirestore();
-      firestore.collection('projects').doc(id).delete()
-      .then(()=>{
-        dispatch({ type: 'DELETE_PROJECT', id: id})
-      }).catch((err)=>{
-        dispatch({ type: 'CREATE_PROJECT_ERROR', err:err}) 
-      })
+export const updateColumnAfterDnD = (columns) => {
+  return (dispatch, getState, { getFirebase, getFirestore }) => {
+    const firestore = getFirestore();
+    // console.log('columns.taskIds', columns.taskIds);
+    firestore.collection('columns').doc(columns.id).update({
+
+      taskIds: columns.taskIds,
     }
+    )
+}
 }
 
-export const editProject =(id, editedProject)=> {
-  return (dispatch, getState, {getFirebase, getFirestore}) =>{
+export const deleteProject = (id) => {
+  return (dispatch, getState, { getFirebase, getFirestore }) => {
+    const firestore = getFirestore();
+    firestore.collection('projects').doc(id).delete()
+      .then(() => {
+        dispatch({ type: 'DELETE_PROJECT', id: id })
+      }).catch((err) => {
+        dispatch({ type: 'CREATE_PROJECT_ERROR', err: err })
+      })
+  }
+}
+
+export const editProject = (id, editedProject) => {
+  return (dispatch, getState, { getFirebase, getFirestore }) => {
     const firestore = getFirestore();
     firestore.collection('projects').doc(id).update(editedProject)
-    .then(()=>{
-      dispatch({ type: 'EDIT_PROJECT', id: id})
-    }).catch((err)=>{
-      dispatch({ type: 'CREATE_PROJECT_ERROR', err:err}) 
-    })
+      .then(() => {
+        dispatch({ type: 'EDIT_PROJECT', id: id })
+      }).catch((err) => {
+        dispatch({ type: 'CREATE_PROJECT_ERROR', err: err })
+      })
   }
 }

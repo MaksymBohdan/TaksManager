@@ -22,7 +22,7 @@ class CreateProject extends Component {
     e.preventDefault()
     const newProject={
       ...this.state,
-      idDnD: uuidv4(),
+      id: uuidv4(),
     }
    this.props.createProject(newProject)
    this.props.history.push('/');
