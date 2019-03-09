@@ -5,9 +5,10 @@ const Notification = props => {
   const { notifications } = props
   return (
     <div>
-      <div className='section'>
-        <div className='card z-depth-0'>
-          <div className='card-content'>
+      {/* <div className='section '> */}
+      
+        <div className='card z-depth-0 '>
+          <div className='card-content '>
             <span className='card-title'>Notifications</span>
             <ul className='notifications'>
               {notifications &&
@@ -42,7 +43,6 @@ const Notification = props => {
           </div>
         </div>
       </div>
-    </div>
   )
 }
 

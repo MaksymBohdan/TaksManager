@@ -7,7 +7,7 @@ import moment from 'moment'
 import { deleteProject, editProject } from '../../redux/actions/projectActions'
 import ModalDelete from './ModalDelete'
 import ModalEdit from './ModalEdit';
-
+import firebase from '../../config/fbConfig'
 
 class ProjectDetails extends Component {
   state = {
@@ -24,8 +24,15 @@ class ProjectDetails extends Component {
 
   handleDeleteProject = e => {
     const id = e.target.dataset.id
-    console.log(id)
-    this.props.deleteProject(id)
+
+    const currentColumn = this.props.columns && this.props.columns.find(el => el.taskIds.includes(id))
+    const updatedColumnIds = currentColumn.taskIds.filter(el => el !== id);
+
+    firebase.firestore().collection('columns').doc(currentColumn.id).update({
+      taskIds: updatedColumnIds
+    }).then(() => this.props.deleteProject(id));
+
+
     this.props.history.push('/')
   }
 
@@ -45,24 +52,24 @@ class ProjectDetails extends Component {
     this.modalToggle();
   }
 
-  modalToggle =() =>{
-    this.setState(prev=> ({
+  modalToggle = () => {
+    this.setState(prev => ({
       modalStatus: !prev.modalStatus
     }))
   }
 
-  
 
-  render () {
+
+  render() {
     const { project, auth, id } = this.props
-    const{title, content, modalStatus}=this.state
+    const { title, content, modalStatus } = this.state
 
     if (!auth.uid) return <Redirect to='/signin' /> // route guards to deny access in loged out
 
     if (project) {
       return (
 
-        <div className='container section project-details'>
+        <div className='container section project-details '>
           <div className='card z-depth-0'>
             <div className='card-content'>
               <span className='card-title'>{project.title}</span>
@@ -74,9 +81,9 @@ class ProjectDetails extends Component {
             </div>
           </div>
           <i onClick={this.updateEditField} className='material-icons left' >edit</i>
-          <ModalDelete id={id} handleDeleteProject={this.handleDeleteProject}/>
-          <ModalEdit id={id} handleEditChange={this.handleEditChange} handleSubmit={this.handleSubmit} 
-          title={title} content={content} updateEditField={this.updateEditField} modalStatus={modalStatus} />
+          <ModalDelete id={id} handleDeleteProject={this.handleDeleteProject} />
+          <ModalEdit id={id} handleEditChange={this.handleEditChange} handleSubmit={this.handleSubmit}
+            title={title} content={content} updateEditField={this.updateEditField} modalStatus={modalStatus} />
         </div>
       )
     } else {
@@ -98,7 +105,8 @@ const mapStateToProps = (state, ownProps) => {
     project: project,
     auth: state.firebase.auth,
     id: id,
-    orderedArr: state.firestore.ordered.projects
+    orderedArr: state.firestore.ordered.projects,
+    columns: state.firestore.ordered.columns,
   }
 }
 

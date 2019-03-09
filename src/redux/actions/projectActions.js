@@ -6,12 +6,6 @@ export const createProject = (project) => {
     const profile = getState().firebase.profile; // getting profile from the state
     const authorId = getState().firebase.auth.uid;
 
-    firestore.collection('columns').doc('column-1').update({
-
-      taskIds: firestore.FieldValue.arrayUnion(project.id)
-
-    });
-
     firestore.collection('projects').doc(project.id).set({ // adding to database before dispatch
       ...project,
       authorFirstName: profile.firstName,
@@ -26,21 +20,10 @@ export const createProject = (project) => {
   }
 }
 
-export const updateColumnAfterDnD = (columns) => {
-  return (dispatch, getState, { getFirebase, getFirestore }) => {
-    const firestore = getFirestore();
-    // console.log('columns.taskIds', columns.taskIds);
-    firestore.collection('columns').doc(columns.id).update({
-
-      taskIds: columns.taskIds,
-    }
-    )
-}
-}
-
 export const deleteProject = (id) => {
   return (dispatch, getState, { getFirebase, getFirestore }) => {
     const firestore = getFirestore();
+
     firestore.collection('projects').doc(id).delete()
       .then(() => {
         dispatch({ type: 'DELETE_PROJECT', id: id })
@@ -49,6 +32,7 @@ export const deleteProject = (id) => {
       })
   }
 }
+
 
 export const editProject = (id, editedProject) => {
   return (dispatch, getState, { getFirebase, getFirestore }) => {

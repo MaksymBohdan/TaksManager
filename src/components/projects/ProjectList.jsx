@@ -1,34 +1,34 @@
 import React from 'react';
 import ProjectSummary from './ProjectSummary';
-import { Droppable } from 'react-beautiful-dnd'
+import { Droppable, Draggable } from 'react-beautiful-dnd'
 
-const ProjectList = ({ column, projectCurrent }) => {
+const ProjectList = ({ column, tasks, index }) => {
 
   return (
-    <div className='row dragContainer'>
-      <div className='col s12 m6 toDoContainer'> {column.title}
-        <Droppable droppableId={column.id}>
-          {(provided) => (
-            <div ref={provided.innerRef}
-              {...provided.droppableProps}
-            >
-              {projectCurrent  && projectCurrent.map((project, index) => <ProjectSummary project={project} key={project.id} id={project.id} index={index}/>)}
-              {provided.placeholder}
-            </div>
-          )}
-        </Droppable>
-      </div>
-    </div >
+    <Draggable draggableId={column.id} index={index}>
+      {(provided) => (
+        <div
+          {...provided.draggableProps}
+
+          ref={provided.innerRef}
+          className='col s12  toDoContainer' >
+          <div {...provided.dragHandleProps}>{column.title}</div>
+          <Droppable droppableId={column.id} type="task">
+            {(provided, snapshot) => (
+              <div
+                className={snapshot.isDraggingOver ? 'purple lighten-5 draggingContainer' : 'white draggingContainer'}
+                ref={provided.innerRef}
+                {...provided.droppableProps}
+              >
+                {tasks.filter(el => el != null).map((project, index) => <ProjectSummary project={project} key={project.id} id={project.id} index={index} />)}
+                {provided.placeholder}
+              </div>
+            )}
+          </Droppable>
+        </div>
+      )}
+    </Draggable>
   )
 }
 
 export default ProjectList;
-
-{/* <ul className='item project-list section '>
-{projects &&
-  projects.map(project => {
-    return (
-      <ProjectSummary projects={project} key={project.id} id={project.id} />
-    )
-  })}
-</ul> */}

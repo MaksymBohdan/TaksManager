@@ -1,14 +1,14 @@
 import React, { Component } from 'react'
-import {connect} from 'react-redux';
-import {createProject} from '../../redux/actions/projectActions'
+import { connect } from 'react-redux';
+import { createProject } from '../../redux/actions/projectActions'
 import { Redirect } from 'react-router-dom'
-import uuidv4 from 'uuid/v4';
+import firebase from '../../config/fbConfig'
 
 class CreateProject extends Component {
   state = {
     title: '',
     content: '',
-   
+
   }
 
   handleChange = e => {
@@ -20,18 +20,25 @@ class CreateProject extends Component {
   //getting value to firestore
   handleSubmit = e => {
     e.preventDefault()
-    const newProject={
+
+    const newProject = {
       ...this.state,
-      id: uuidv4(),
+      id: Date.now().toString(),
     }
-   this.props.createProject(newProject)
-   this.props.history.push('/');
+
+    const fb = firebase.firestore();
+    fb.collection('columns').doc('column-1').update({
+      taskIds: firebase.firestore.FieldValue.arrayUnion(newProject.id)
+    });
+
+    this.props.createProject(newProject)
+    this.props.history.push('/');
   }
 
-  render () {
-    const{auth}= this.props;
+  render() {
+    const { auth } = this.props;
     if (!auth.uid) return <Redirect to='/signin' /> // route guards to deny access in loged out
-    
+
     return (
       <div className='container'>
         <form onSubmit={this.handleSubmit} className='white'>
@@ -43,7 +50,7 @@ class CreateProject extends Component {
 
           <div className='input-field'>
             <label htmlFor='password'>Project Content</label>
-           <textarea  id="content"  className="materialize-textarea" onChange={this.handleChange}></textarea>
+            <textarea id="content" className="materialize-textarea" onChange={this.handleChange}></textarea>
           </div>
 
           <div className='input-field'>
@@ -55,15 +62,15 @@ class CreateProject extends Component {
   }
 }
 
-const MapStateToProps =(state)=>{
-  return{
+const MapStateToProps = (state) => {
+  return {
     auth: state.firebase.auth,
   }
 }
-const mapDispatchToProps =(dispatch)=>{
-  return{
+const mapDispatchToProps = (dispatch) => {
+  return {
     createProject: (project) =>
-    dispatch(createProject(project))
+      dispatch(createProject(project))
   }
 }
 

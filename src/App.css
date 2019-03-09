@@ -1,9 +1,28 @@
 
 .toDoContainer{
-  background-color: rgba(236, 220, 250, 0.5);
+  border: 1px solid grey;
+  background-color: rgba(0,0,128, 0.3);
   overflow:auto;
-  min-height: 300px !important;
-  max-height: 300px;
-  margin-left: 10px;
+  min-height: 800px !important;
+  max-height: 800px;
+width: 30%;
+margin-top: 10px;
 }
 
+.draggingContainer{
+  padding:5px 10px;
+  display: flex;
+  flex-direction: column;
+  min-height: 770px !important;
+
+}
+
+.task{
+  border: 1px solid grey;
+  
+}
+
+.aaa{
+  display: flex ;
+  justify-content: space-between !important;
+}

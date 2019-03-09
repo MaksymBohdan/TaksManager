@@ -5,39 +5,76 @@ import { connect } from 'react-redux'
 import { firestoreConnect } from 'react-redux-firebase'
 import { compose } from 'redux'
 import { Redirect } from 'react-router-dom'
-import { DragDropContext } from 'react-beautiful-dnd'
-import {updateColumnAfterDnD} from '../../redux/actions/projectActions'
+import { DragDropContext, Droppable } from 'react-beautiful-dnd'
+import firebase from '../../config/fbConfig'
 
 
 class Dashboard extends Component {
 
 
   onDragEnd = (result) => {
-    const { destination, source, draggableId } = result;
-
+    const { destination, source, draggableId, type } = result;
 
     if (!destination) return;
     if (destination.droppableId === source.droppableId && destination.index === source.index) return;
 
-    const column = this.props.columns.find(el => el.id === source.droppableId)
-    // console.log('column', column);
-    const newProjectIds = [...column.taskIds];
+    const start = this.props.columns[source.droppableId];
+    const finish = this.props.columns[destination.droppableId];
 
-    console.log(newProjectIds);
-    newProjectIds.splice(source.index, 1);
-    console.log(newProjectIds);
-    newProjectIds.splice(destination.index, 0, draggableId);
-    console.log(newProjectIds);
 
-    const newColumn ={
-      ...column,
-      taskIds:newProjectIds,
+    //moving of columns
+    if (type === 'column') {
+      const newColumnOrder = Array.from(this.props.columnOrder.DOVn8mVxsU59mUOqX5pf.columnOrder)
+      newColumnOrder.splice(source.index, 1);
+      newColumnOrder.splice(destination.index, 0, draggableId);
+      console.log(newColumnOrder);
+      this.createNewColumnsOrder(newColumnOrder)
+      return
     }
 
-    this.props.updateColumnAfterDnD(newColumn);
+    // moving inside the same column
+    if (start === finish) {
+      const newTaskIds = Array.from(start.taskIds) // to avoid mutating of existing state
+      newTaskIds.splice(source.index, 1)
+      newTaskIds.splice(destination.index, 0, draggableId)
+
+      const newColumn = {
+        ...start,
+        taskIds: newTaskIds
+      }
+      this.updateTasksOrder(newColumn); //update column's order
+      return;
+    }
+
+
+    //moving from one list to another
+    const startTaskIds = Array.from(start.taskIds);
+    startTaskIds.splice(source.index, 1);
+    const newStart = { ...start, taskIds: startTaskIds };
+    this.updateTasksOrder(newStart)
+
+
+    const finishTaskIds = Array.from(finish.taskIds);
+    finishTaskIds.splice(destination.index, 0, draggableId)
+    const newFinish = { ...finish, taskIds: finishTaskIds }
+    this.updateTasksOrder(newFinish)
 
   }
 
+
+  updateTasksOrder = (column) => {
+    firebase.firestore().collection('columns').doc(column.id).update({
+
+      taskIds: column.taskIds,
+    }
+    )
+  }
+
+  createNewColumnsOrder =(column) => {
+    firebase.firestore().collection('columnOrder').doc('DOVn8mVxsU59mUOqX5pf').update({
+      columnOrder: column
+    })
+  } 
   render() {
     const { projects, auth, notifications, columns, columnOrder } = this.props
 
@@ -46,13 +83,26 @@ class Dashboard extends Component {
     } else {
       return (
         <DragDropContext onDragEnd={this.onDragEnd}>
-          <div className='dashboard container '>
-            {projects && columns && columnOrder && columnOrder[0].columnOrder.map((columnId, inx) => {
-              const column = columns[inx];
-              const projectCurrent = column.taskIds.map((taskId, indx) => projects[indx])
-              return <ProjectList key={column.id} column={column} projectCurrent={projectCurrent} />
-            })}
-          </div>
+          <Droppable droppableId='all columns' direction='horizontal' type='column'>
+            {provided => (
+              <div
+                {...provided.droppableProps}
+                ref={provided.innerRef}
+              >
+                <div className='dashboard container aaa'>
+                  {
+                    columnOrder && columnOrder.DOVn8mVxsU59mUOqX5pf.columnOrder.map((columnId, index) => {
+                      const column = columns[columnId];
+                      const tasks = column.taskIds.map(taskId => projects[taskId])
+                      return <ProjectList key={column.id} column={column} tasks={tasks} index={index} />
+                    })
+                  }
+                </div>
+                <Notification notifications={notifications} />
+                {provided.placeholder}
+              </div>
+            )}
+          </Droppable>
         </DragDropContext>
       )
     }
@@ -61,30 +111,25 @@ class Dashboard extends Component {
 
 const mapStateToProps = state => {
   return {
-    projects: state.firestore.ordered.projects || null,
+    projects: state.firestore.data.projects,
     auth: state.firebase.auth,
     notifications: state.firestore.ordered.notifications,
-    columns: state.firestore.ordered.columns,
-    columnOrder: state.firestore.ordered.columnOrder,
-  }
-}
-
-const mapDispatchToProps = dispatch => {
-  return{
-    updateColumnAfterDnD: (column) =>
-    dispatch(updateColumnAfterDnD(column))
+    columns: state.firestore.data.columns,
+    columnOrder: state.firestore.data.columnOrder,
   }
 }
 
 
 
 export default compose(
-  connect(mapStateToProps, mapDispatchToProps),
+  connect(mapStateToProps, null),
   firestoreConnect([
     // HOC for connecting to a single collection in firebase
-    { collection: 'projects', /* orderBy: ['createdAt', 'asc'] the order of mapping */ }, // when component is active use projects collection to put in appropriate cell in state
+    { collection: 'projects', orderBy: ['createdAt', 'asc'] /* the order of mapping */ }, // when component is active use projects collection to put in appropriate cell in state
     { collection: 'notifications', limit: 3, orderBy: ['time', 'desc'] }, // connecting to notification collection
     { collection: 'columns' },
     { collection: 'columnOrder' },
   ])
 )(Dashboard)
+
+
