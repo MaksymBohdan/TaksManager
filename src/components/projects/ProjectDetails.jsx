@@ -13,7 +13,6 @@ class ProjectDetails extends Component {
   state = {
     title: '',
     content: '',
-    modalStatus: false,
   }
 
   handleEditChange = e => {
@@ -26,12 +25,12 @@ class ProjectDetails extends Component {
     const id = e.target.dataset.id
 
     const currentColumn = this.props.columns && this.props.columns.find(el => el.taskIds.includes(id))
+    this.props.columns &&  console.log('currentColumn', this.props.columns );
     const updatedColumnIds = currentColumn.taskIds.filter(el => el !== id);
 
     firebase.firestore().collection('columns').doc(currentColumn.id).update({
       taskIds: updatedColumnIds
     }).then(() => this.props.deleteProject(id));
-
 
     this.props.history.push('/')
   }
@@ -40,7 +39,6 @@ class ProjectDetails extends Component {
     e.preventDefault()
     const id = e.target.dataset.id
     this.props.editProject(id, this.state)
-    this.modalToggle();
   }
 
   updateEditField = () => {
@@ -49,30 +47,27 @@ class ProjectDetails extends Component {
       content: this.props.project.content,
     })
 
-    this.modalToggle();
   }
-
-  modalToggle = () => {
-    this.setState(prev => ({
-      modalStatus: !prev.modalStatus
-    }))
-  }
-
-
 
   render() {
     const { project, auth, id } = this.props
-    const { title, content, modalStatus } = this.state
+    const { title, content} = this.state
 
     if (!auth.uid) return <Redirect to='/signin' /> // route guards to deny access in loged out
 
     if (project) {
       return (
-
         <div className='container section project-details '>
           <div className='card z-depth-0'>
             <div className='card-content'>
-              <span className='card-title'>{project.title}</span>
+              <div className="title-header">
+                <span className='card-title'>{project.title}</span>
+                <div>
+                  <i onClick={this.updateEditField} className='material-icons left modal-trigger' href="#modal1" >edit</i>
+                  <i className='material-icons left modal-trigger' href="#modal2" onClick={this.modalToggleDelete}>delete_forever </i>
+                </div>
+              </div>
+
               <div>{project.content}</div>
             </div>
             <div className='card-action grey lighten-4 grey-text'>
@@ -80,10 +75,14 @@ class ProjectDetails extends Component {
               <div>{moment(project.createdAt.toDate()).calendar()}</div>
             </div>
           </div>
-          <i onClick={this.updateEditField} className='material-icons left' >edit</i>
-          <ModalDelete id={id} handleDeleteProject={this.handleDeleteProject} />
-          <ModalEdit id={id} handleEditChange={this.handleEditChange} handleSubmit={this.handleSubmit}
-            title={title} content={content} updateEditField={this.updateEditField} modalStatus={modalStatus} />
+          <ModalDelete id={id}
+            handleDeleteProject={this.handleDeleteProject} />
+          <ModalEdit id={id}
+            handleEditChange={this.handleEditChange}
+            handleSubmit={this.handleSubmit}
+            title={title}
+            content={content}
+             />
         </div>
       )
     } else {
@@ -105,7 +104,6 @@ const mapStateToProps = (state, ownProps) => {
     project: project,
     auth: state.firebase.auth,
     id: id,
-    orderedArr: state.firestore.ordered.projects,
     columns: state.firestore.ordered.columns,
   }
 }
@@ -122,5 +120,8 @@ export default compose(
     mapStateToProps,
     mapDispatchToProps
   ),
-  firestoreConnect([{ collection: 'projects' }])
+  firestoreConnect([
+  { collection: 'projects'},
+  { collection: 'columns' },
+])
 )(ProjectDetails)

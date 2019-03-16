@@ -4,30 +4,29 @@ import moment from 'moment'
 const Notification = props => {
   const { notifications } = props
   return (
-    <div>
-      {/* <div className='section '> */}
-      
-        <div className='card z-depth-0 '>
-          <div className='card-content '>
+    <div className="row">
+
+    { notifications &&  <div className="col s12 m4 offset-m4 ">
+        <div className='card z-depth-0 notifi  '>
+          <div className='card-content  '>
             <span className='card-title'>Notifications</span>
             <ul className='notifications'>
-              {notifications &&
-                notifications.map(item => {
-                  return (
-                    <li key={item.id}>
-                      {item.title ? (
-                        <div>
-                          <span className='black-text'>
-                            <span className='pink-text'>{item.title} </span>
-                            {item.content} by
+              {notifications && notifications.map(item => {
+                return (
+                  <li key={item.id}>
+                    {item.title ? (
+                      <div>
+                        <span className='black-text'>
+                          <span className='pink-text'>{item.title} </span>
+                          {item.content} by
                           </span>
-                          <span className='pink-text'> {item.user}</span>
-                          <div className='grey-text note-date'>
-                            {moment(item.time.toDate()).fromNow()}
-                          </div>
+                        <span className='pink-text'> {item.user}</span>
+                        <div className='grey-text note-date'>
+                          {moment(item.time.toDate()).fromNow()}
                         </div>
-                      ) : (
-                        
+                      </div>
+                    ) : (
+
                         <div>
                           <span className='pink-text'>{item.user} </span>
                           <span>{item.content}</span>
@@ -36,13 +35,15 @@ const Notification = props => {
                           </div>
                         </div>
                       )}
-                    </li>
-                  )
-                })}
+                  </li>
+                )
+              })}
             </ul>
           </div>
         </div>
       </div>
+    }
+    </div>
   )
 }
 

@@ -18,7 +18,7 @@ const ProjectSummary = ({ project, id, index }) => {
         ref={provided.innerRef}
         >
 
-          <div className= 'card-content grey-text text-darken-3'>
+          <div className= 'card-content grey-text text-darken-3 '>
             <Link to={'/projects/' + id}>
               <span className='pink-text card-title'>{project.title}</span>
             </Link>

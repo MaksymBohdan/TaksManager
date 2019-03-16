@@ -2,20 +2,24 @@ import React from 'react';
 import { Modal } from 'react-materialize'
 
 
-const ModalEdit = ({ handleSubmit, handleEditChange, id, title, content, modalStatus }) => {
+const ModalEdit = ({ handleSubmit, handleEditChange, id, title, content, modalStatusEdit }) => {
 
   return (
-    <Modal actions={false} open={modalStatus}>
-      <p className='center-align'>Please update your project</p>
-      <form onSubmit={handleSubmit} className='white' data-id={id} >
+    <Modal actions={false} id="modal1">
+
+      <form onSubmit={handleSubmit} className='white form-edit' data-id={id} >
+        <h5 className='center-align'>Please update your project</h5>
+        
         <div className='input-field'>
-          <input onChange={handleEditChange} type='text' id='title' value={title} placeholder='update title'/>
+          <input onChange={handleEditChange} type='text' id='title' value={title} placeholder='update title' />
         </div>
+        
         <div className='input-field'>
-          <textarea onChange={handleEditChange} id='content' className='materialize-textarea' value={content} placeholder='update content' />
+          <input onChange={handleEditChange} id='content' className='materialize-textarea' value={content} placeholder='update content' />
         </div>
+        
         <div className='input-field'>
-          <button className='btn pink lighten-1 z-depth-0' >Create</button>
+          <button className='waves-effect waves-light btn-small modal-close' >Update</button>
         </div>
       </form>
     </Modal>

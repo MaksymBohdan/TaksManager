@@ -11,8 +11,9 @@ import firebase from '../../config/fbConfig'
 
 class Dashboard extends Component {
 
-
   onDragEnd = (result) => {
+ 
+
     const { destination, source, draggableId, type } = result;
 
     if (!destination) return;
@@ -27,7 +28,7 @@ class Dashboard extends Component {
       const newColumnOrder = Array.from(this.props.columnOrder.DOVn8mVxsU59mUOqX5pf.columnOrder)
       newColumnOrder.splice(source.index, 1);
       newColumnOrder.splice(destination.index, 0, draggableId);
-      console.log(newColumnOrder);
+
       this.createNewColumnsOrder(newColumnOrder)
       return
     }
@@ -71,6 +72,7 @@ class Dashboard extends Component {
   }
 
   createNewColumnsOrder =(column) => {
+
     firebase.firestore().collection('columnOrder').doc('DOVn8mVxsU59mUOqX5pf').update({
       columnOrder: column
     })
@@ -86,10 +88,11 @@ class Dashboard extends Component {
           <Droppable droppableId='all columns' direction='horizontal' type='column'>
             {provided => (
               <div
+              className=" "
                 {...provided.droppableProps}
                 ref={provided.innerRef}
               >
-                <div className='dashboard container aaa'>
+                <div className='dashboard container column-main-area'>
                   {
                     columnOrder && columnOrder.DOVn8mVxsU59mUOqX5pf.columnOrder.map((columnId, index) => {
                       const column = columns[columnId];
@@ -97,9 +100,10 @@ class Dashboard extends Component {
                       return <ProjectList key={column.id} column={column} tasks={tasks} index={index} />
                     })
                   }
+
                 </div>
-                <Notification notifications={notifications} />
                 {provided.placeholder}
+                <Notification notifications={notifications} />
               </div>
             )}
           </Droppable>
