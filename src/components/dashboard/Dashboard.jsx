@@ -12,13 +12,12 @@ import firebase from '../../config/fbConfig'
 class Dashboard extends Component {
 
   onDragEnd = (result) => {
-    
+
     const { destination, source, draggableId, type } = result;
     if (!destination) return;
     if (destination.droppableId === source.droppableId && destination.index === source.index) return;
 
 
-  
     const start = this.props.columns[source.droppableId];
     const finish = this.props.columns[destination.droppableId];
 
