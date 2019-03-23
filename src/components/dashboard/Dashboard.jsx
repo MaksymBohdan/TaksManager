@@ -11,20 +11,22 @@ import firebase from '../../config/fbConfig'
 
 class Dashboard extends Component {
 
-  onDragEnd = (result) => {
- 
 
+  onDragEnd = (result) => {
     const { destination, source, draggableId, type } = result;
 
     if (!destination) return;
     if (destination.droppableId === source.droppableId && destination.index === source.index) return;
 
+
+   
     const start = this.props.columns[source.droppableId];
     const finish = this.props.columns[destination.droppableId];
 
 
     //moving of columns
     if (type === 'column') {
+      
       const newColumnOrder = Array.from(this.props.columnOrder.DOVn8mVxsU59mUOqX5pf.columnOrder)
       newColumnOrder.splice(source.index, 1);
       newColumnOrder.splice(destination.index, 0, draggableId);
@@ -35,6 +37,7 @@ class Dashboard extends Component {
 
     // moving inside the same column
     if (start === finish) {
+     
       const newTaskIds = Array.from(start.taskIds) // to avoid mutating of existing state
       newTaskIds.splice(source.index, 1)
       newTaskIds.splice(destination.index, 0, draggableId)
@@ -46,9 +49,9 @@ class Dashboard extends Component {
       this.updateTasksOrder(newColumn); //update column's order
       return;
     }
-
-
     //moving from one list to another
+    document.getElementById(draggableId).setAttribute('class', 'component-hiden');
+
     const startTaskIds = Array.from(start.taskIds);
     startTaskIds.splice(source.index, 1);
     const newStart = { ...start, taskIds: startTaskIds };
@@ -62,21 +65,19 @@ class Dashboard extends Component {
 
   }
 
-
   updateTasksOrder = (column) => {
     firebase.firestore().collection('columns').doc(column.id).update({
-
       taskIds: column.taskIds,
     }
     )
   }
 
-  createNewColumnsOrder =(column) => {
-
+  createNewColumnsOrder = (column, ) => {
     firebase.firestore().collection('columnOrder').doc('DOVn8mVxsU59mUOqX5pf').update({
       columnOrder: column
     })
-  } 
+  }
+
   render() {
     const { projects, auth, notifications, columns, columnOrder } = this.props
 
@@ -88,29 +89,31 @@ class Dashboard extends Component {
           <Droppable droppableId='all columns' direction='horizontal' type='column'>
             {provided => (
               <div
-              className=" "
+                className=" "
                 {...provided.droppableProps}
                 ref={provided.innerRef}
               >
-                <div className='dashboard container column-main-area'>
-                  {
-                    columnOrder && columnOrder.DOVn8mVxsU59mUOqX5pf.columnOrder.map((columnId, index) => {
-                      const column = columns[columnId];
-                      const tasks = column.taskIds.map(taskId => projects[taskId])
-                      return <ProjectList key={column.id} column={column} tasks={tasks} index={index} />
-                    })
-                  }
 
+                <div className='dashboard container column-main-area'>
+                  {columnOrder && columnOrder.DOVn8mVxsU59mUOqX5pf.columnOrder.map((columnId, index) => {
+                    const column = columns[columnId];
+                    const tasks = column.taskIds.map(taskId => projects[taskId])
+                    return <ProjectList key={column.id} column={column} tasks={tasks} index={index} />
+                  })
+                  }
                 </div>
                 {provided.placeholder}
                 <Notification notifications={notifications} />
               </div>
             )}
           </Droppable>
+
         </DragDropContext>
       )
     }
+
   }
+
 }
 
 const mapStateToProps = state => {

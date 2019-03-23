@@ -15,7 +15,6 @@
   flex-direction: column;
   min-height: 412px !important;
   overflow: auto;
-
 }
 
 .task{
@@ -51,7 +50,10 @@
     background-color: #d10945;
     border-radius: 5px;}
 
-    .form-edit{
+  .form-edit{
       padding: 0;
       margin: 0;
     }
+.component-hiden{
+    opacity:0;
+}
