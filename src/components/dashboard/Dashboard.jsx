@@ -51,32 +51,23 @@ class Dashboard extends Component {
     if (!destination) return;
     if (destination.droppableId === source.droppableId && destination.index === source.index) return;
 
-
-    // const start = this.props.columns[source.droppableId];
-    // const finish = this.props.columns[destination.droppableId];
     const start = this.state.columns[source.droppableId];
     const finish = this.state.columns[destination.droppableId];
 
-
     //moving of columns
     if (type === 'column') {
-
-      // const newColumnOrder = Array.from(this.props.columnOrder.DOVn8mVxsU59mUOqX5pf.columnOrder)
       const newColumnOrder = Array.from(this.state.columnOrder.columnOrder)
       newColumnOrder.splice(source.index, 1);
       newColumnOrder.splice(destination.index, 0, draggableId);
-      console.log('newColumnOrder', newColumnOrder);
       this.setState({
         columnOrder: { columnOrder: newColumnOrder }
       },
         () => this.createNewColumnsOrder(newColumnOrder))
-
       return
     }
 
     // moving inside the same column
     if (start === finish) {
-
       const newTaskIds = Array.from(start.taskIds) // to avoid mutating of existing state
       newTaskIds.splice(source.index, 1)
       newTaskIds.splice(destination.index, 0, draggableId)
@@ -98,7 +89,6 @@ class Dashboard extends Component {
       return;
     }
     //moving from one list to another
-    // document.getElementById(draggableId).setAttribute('class', 'component-hiden');
     const startTaskIds = Array.from(start.taskIds);
     startTaskIds.splice(source.index, 1);
     const newStart = { ...start, taskIds: startTaskIds };
@@ -106,14 +96,14 @@ class Dashboard extends Component {
     const finishTaskIds = Array.from(finish.taskIds);
     finishTaskIds.splice(destination.index, 0, draggableId)
     const newFinish = { ...finish, taskIds: finishTaskIds }
-    
+
     const newState = {
       ...this.state,
       columns: {
         ...this.state.columns,
         [newStart.id]: newStart,
         [newFinish.id]: newFinish,
-      }, 
+      },
     }
 
     this.setState(newState, () => {
@@ -126,13 +116,6 @@ class Dashboard extends Component {
     firebase.firestore().collection('columns').doc(column.id).update({
       taskIds: column.taskIds,
     })
-    console.log('yes');
-  }
-
-  updateCollection = (newCollection) => {
-    firebase.firestore().collection('columns').update({
-
-    })
   }
 
   createNewColumnsOrder = (column) => {
@@ -143,7 +126,6 @@ class Dashboard extends Component {
 
   render() {
     const { auth, notifications } = this.props
-    // columns, columnOrder, projects
     const { columns, columnOrder, projects } = this.state
     if (!auth.uid) {
       return <Redirect to='/signin' /> // route guards to deny access in loged out
@@ -158,7 +140,6 @@ class Dashboard extends Component {
                 ref={provided.innerRef}
               >
                 <div className='dashboard container column-main-area'>
-                  {/* DOVn8mVxsU59mUOqX5pf. */}
                   {columnOrder && columnOrder.columnOrder.map((columnId, index) => {
                     const column = columns[columnId];
                     const tasks = column.taskIds.map(taskId => projects[taskId])
@@ -191,10 +172,7 @@ export default compose(
   connect(mapStateToProps, null),
   firestoreConnect([
     // HOC for connecting to a single collection in firebase
-    { collection: 'projects', orderBy: ['createdAt', 'asc'] /* the order of mapping */ }, // when component is active use projects collection to put in appropriate cell in state
     { collection: 'notifications', limit: 3, orderBy: ['time', 'desc'] }, // connecting to notification collection
-    { collection: 'columns' },
-    { collection: 'columnOrder' },
   ])
 )(Dashboard)
 
