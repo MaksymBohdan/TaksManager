@@ -10,90 +10,156 @@ import firebase from '../../config/fbConfig'
 
 
 class Dashboard extends Component {
+  state = {
+    projects: null,
+    columns: null,
+    columnOrder: null,
+  }
+
+  componentDidMount() {
+    firebase.firestore().collection('projects').get()
+      .then(docs => {
+        const projectsFb = {};
+        docs.forEach(doc => projectsFb[doc.data().id] = doc.data())
+        this.setState({
+          projects: projectsFb
+        })
+      });
+
+    firebase.firestore().collection('columns').get()
+      .then(docs => {
+        const columnsFb = {};
+        docs.forEach(doc => columnsFb[doc.data().id] = doc.data())
+        this.setState({
+          columns: columnsFb
+        })
+      })
+
+    firebase.firestore().collection('columnOrder').doc('DOVn8mVxsU59mUOqX5pf').get()
+      .then(docs => {
+        this.setState({
+          columnOrder: docs.data()
+        })
+
+      })
+  }
+
 
   onDragEnd = (result) => {
-
     const { destination, source, draggableId, type } = result;
+
     if (!destination) return;
     if (destination.droppableId === source.droppableId && destination.index === source.index) return;
 
 
-    const start = this.props.columns[source.droppableId];
-    const finish = this.props.columns[destination.droppableId];
+    // const start = this.props.columns[source.droppableId];
+    // const finish = this.props.columns[destination.droppableId];
+    const start = this.state.columns[source.droppableId];
+    const finish = this.state.columns[destination.droppableId];
 
 
     //moving of columns
     if (type === 'column') {
-      
-      const newColumnOrder = Array.from(this.props.columnOrder.DOVn8mVxsU59mUOqX5pf.columnOrder)
+
+      // const newColumnOrder = Array.from(this.props.columnOrder.DOVn8mVxsU59mUOqX5pf.columnOrder)
+      const newColumnOrder = Array.from(this.state.columnOrder.columnOrder)
       newColumnOrder.splice(source.index, 1);
       newColumnOrder.splice(destination.index, 0, draggableId);
+      console.log('newColumnOrder', newColumnOrder);
+      this.setState({
+        columnOrder: { columnOrder: newColumnOrder }
+      },
+        () => this.createNewColumnsOrder(newColumnOrder))
 
-      this.createNewColumnsOrder(newColumnOrder)
       return
     }
 
     // moving inside the same column
     if (start === finish) {
-     
+
       const newTaskIds = Array.from(start.taskIds) // to avoid mutating of existing state
       newTaskIds.splice(source.index, 1)
       newTaskIds.splice(destination.index, 0, draggableId)
 
-      const newColumn = {
+      const newColumn = { // to update firebase
         ...start,
         taskIds: newTaskIds
       }
-      this.updateTasksOrder(newColumn); //update column's order
+
+      const newColumns = { // to update state
+        ...this.state.columns,
+        [newColumn.id]: newColumn
+      }
+
+      this.setState({
+        columns: newColumns
+      }, () => this.updateTasksOrder(newColumn)) //update column's order
+
       return;
     }
     //moving from one list to another
-    document.getElementById(draggableId).setAttribute('class', 'component-hiden');
-
+    // document.getElementById(draggableId).setAttribute('class', 'component-hiden');
     const startTaskIds = Array.from(start.taskIds);
     startTaskIds.splice(source.index, 1);
     const newStart = { ...start, taskIds: startTaskIds };
-    this.updateTasksOrder(newStart)
-
 
     const finishTaskIds = Array.from(finish.taskIds);
     finishTaskIds.splice(destination.index, 0, draggableId)
     const newFinish = { ...finish, taskIds: finishTaskIds }
-    this.updateTasksOrder(newFinish)
+    
+    const newState = {
+      ...this.state,
+      columns: {
+        ...this.state.columns,
+        [newStart.id]: newStart,
+        [newFinish.id]: newFinish,
+      }, 
+    }
 
+    this.setState(newState, () => {
+      this.updateTasksOrder(newStart)
+      this.updateTasksOrder(newFinish)
+    })
   }
 
   updateTasksOrder = (column) => {
     firebase.firestore().collection('columns').doc(column.id).update({
       taskIds: column.taskIds,
-    }
-    )
+    })
+    console.log('yes');
   }
 
-  createNewColumnsOrder = (column, ) => {
+  updateCollection = (newCollection) => {
+    firebase.firestore().collection('columns').update({
+
+    })
+  }
+
+  createNewColumnsOrder = (column) => {
     firebase.firestore().collection('columnOrder').doc('DOVn8mVxsU59mUOqX5pf').update({
       columnOrder: column
     })
   }
 
   render() {
-    const { projects, auth, notifications, columns, columnOrder } = this.props
-
+    const { auth, notifications } = this.props
+    // columns, columnOrder, projects
+    const { columns, columnOrder, projects } = this.state
     if (!auth.uid) {
       return <Redirect to='/signin' /> // route guards to deny access in loged out
     } else {
+
       return (
         <DragDropContext onDragEnd={this.onDragEnd}>
           <Droppable droppableId='all columns' direction='horizontal' type='column'>
             {provided => (
               <div
-                className=" "
                 {...provided.droppableProps}
                 ref={provided.innerRef}
               >
-
                 <div className='dashboard container column-main-area'>
-                  {columnOrder && columnOrder.DOVn8mVxsU59mUOqX5pf.columnOrder.map((columnId, index) => {
+                  {/* DOVn8mVxsU59mUOqX5pf. */}
+                  {columnOrder && columnOrder.columnOrder.map((columnId, index) => {
                     const column = columns[columnId];
                     const tasks = column.taskIds.map(taskId => projects[taskId])
                     return <ProjectList key={column.id} column={column} tasks={tasks} index={index} />
@@ -105,13 +171,10 @@ class Dashboard extends Component {
               </div>
             )}
           </Droppable>
-
         </DragDropContext>
       )
     }
-
   }
-
 }
 
 const mapStateToProps = state => {
@@ -123,8 +186,6 @@ const mapStateToProps = state => {
     columnOrder: state.firestore.data.columnOrder,
   }
 }
-
-
 
 export default compose(
   connect(mapStateToProps, null),

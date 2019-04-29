@@ -5,10 +5,9 @@ const Notification = props => {
   const { notifications } = props
   return (
     <div className="row">
-
-    { notifications &&  <div className="col s12 m4 offset-m4 ">
-        <div className='card z-depth-0 notifi  '>
-          <div className='card-content  '>
+      {notifications && <div className="col s12 m4 offset-m4 ">
+        <div className='card z-depth-0'>
+          <div className='card-content'>
             <span className='card-title'>Notifications</span>
             <ul className='notifications'>
               {notifications && notifications.map(item => {
@@ -42,7 +41,7 @@ const Notification = props => {
           </div>
         </div>
       </div>
-    }
+      }
     </div>
   )
 }
