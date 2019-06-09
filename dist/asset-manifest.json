@@ -1,14 +1,14 @@
 {
-  "main.css": "/static/css/main.26b70be5.chunk.css",
-  "main.js": "/static/js/main.86e719c2.chunk.js",
-  "main.js.map": "/static/js/main.86e719c2.chunk.js.map",
-  "static/js/1.d92b63ea.chunk.js": "/static/js/1.d92b63ea.chunk.js",
-  "static/js/1.d92b63ea.chunk.js.map": "/static/js/1.d92b63ea.chunk.js.map",
+  "main.css": "/static/css/main.b712f7a4.chunk.css",
+  "main.js": "/static/js/main.6763704d.chunk.js",
+  "main.js.map": "/static/js/main.6763704d.chunk.js.map",
+  "static/js/1.fddf0e40.chunk.js": "/static/js/1.fddf0e40.chunk.js",
+  "static/js/1.fddf0e40.chunk.js.map": "/static/js/1.fddf0e40.chunk.js.map",
   "runtime~main.js": "/static/js/runtime~main.229c360f.js",
   "runtime~main.js.map": "/static/js/runtime~main.229c360f.js.map",
   "static/media/index.css": "/static/media/mario_bck.3ecd0557.jpg",
-  "static/css/main.26b70be5.chunk.css.map": "/static/css/main.26b70be5.chunk.css.map",
+  "static/css/main.b712f7a4.chunk.css.map": "/static/css/main.b712f7a4.chunk.css.map",
   "index.html": "/index.html",
-  "precache-manifest.598f92f1428d3453c16b68a906cc40cf.js": "/precache-manifest.598f92f1428d3453c16b68a906cc40cf.js",
+  "precache-manifest.9d80816f8883116b3af865e39a20dd8c.js": "/precache-manifest.9d80816f8883116b3af865e39a20dd8c.js",
   "service-worker.js": "/service-worker.js"
 }
